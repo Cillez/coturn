@@ -1,4 +1,4 @@
-# Hades Coturn Server
+# Hades Coturn Server (Bare-Metal)
 
 A production-ready TURN/STUN server for the Hades Project, optimized for P2P gaming traffic.
 
@@ -14,98 +14,90 @@ This Coturn server provides:
 
 ### Prerequisites
 
+- Ubuntu/Debian VPS with root access
 - A domain name (e.g., `coturn.dybng.no`)
-- SSL certificates (Let's Encrypt recommended)
 - Open ports: 3478, 5349, and 49152-49999
+- SSL certificates (Let's Encrypt recommended)
 
-### Deployment Options
+### Installation
 
-**Option 1: Docker (Recommended for development/testing)**
-- Docker and Docker Compose
-- Easy to manage and update
+1. **Copy files to your VPS:**
+   ```bash
+   scp -r hades-coturn-server/ user@your-vps:~/
+   ```
 
-**Option 2: Bare-Metal (Recommended for production VPS)**
-- Direct installation on VPS
-- Better performance and resource usage
-- More control over system configuration
+2. **Install and configure:**
+   ```bash
+   ssh user@your-vps
+   cd hades-coturn-server
+   sudo ./install-bare-metal.sh
+   ```
 
-### 1. Configuration
+3. **Verify installation:**
+   ```bash
+   sudo systemctl status hades-coturn
+   ```
 
-```bash
-# Copy the example environment file
-cp .env.example .env
+## Configuration
 
-# Edit the configuration
-nano .env
-```
+The server is configured via `/etc/coturn/turnserver.conf` with these key settings:
 
-**Required Settings:**
-```bash
-# Domain must match your SSL certificate
-TURN_DOMAIN=coturn.dybng.no
-TURN_REALM=coturn.dybng.no
+- **Domain**: `coturn.dybng.no`
+- **Authentication Secret**: `test-secret-key` (must match your backend)
+- **Ports**: 3478 (STUN/TURN), 5349 (TURN TLS), 49152-49999 (relay ports)
+- **SSL Certificates**: Auto-managed via Let's Encrypt
 
-# Must match your backend's TURN_SECRET
-TURN_SECRET=test-secret-key
+## SSL Certificates
 
-# Set to your server's public IP
-EXTERNAL_IP=your-server-ip
-```
-
-### 2. SSL Certificates
-
-For production deployment, obtain SSL certificates:
+The installation script automatically obtains Let's Encrypt certificates for your domain. If you need to renew them manually:
 
 ```bash
-# Using Let's Encrypt (recommended)
 sudo certbot certonly --standalone -d coturn.dybng.no
-
-# Or using Docker
-docker run -it --rm --name certbot \
-  -v "/etc/letsencrypt:/etc/letsencrypt" \
-  -v "/var/lib/letsencrypt:/var/lib/letsencrypt" \
-  certbot/certbot certonly --standalone -d coturn.dybng.no
-
-# Verify certificates exist
-ls -la /etc/letsencrypt/live/coturn.dybng.no/
 ```
 
-## Bare-Metal Deployment (Production VPS)
+## Management
 
-For production deployment on a dedicated VPS, use the bare-metal installation:
-
-### 1. Copy Files to VPS
+### Service Control
 
 ```bash
-# Copy the entire hades-coturn-server directory to your VPS
-scp -r hades-coturn-server/ user@your-vps:~/
-```
+# Start the service
+sudo systemctl start hades-coturn
 
-### 2. Install and Configure
+# Stop the service
+sudo systemctl stop hades-coturn
 
-```bash
-# SSH to your VPS
-ssh user@your-vps
-cd hades-coturn-server
+# Restart the service
+sudo systemctl restart hades-coturn
 
-# Run the installation script (as root)
-sudo ./install-bare-metal.sh
-```
-
-### 3. Verify Installation
-
-```bash
 # Check service status
 sudo systemctl status hades-coturn
 
-# View logs
-sudo journalctl -u hades-coturn -f
-
-# Test connectivity
-curl -v turn:coturn.dybng.no:3478
+# Enable on boot
+sudo systemctl enable hades-coturn
 ```
 
-## Docker Deployment (Development/Testing)
+### Logs
+
+```bash
+# View current logs
+sudo journalctl -u hades-coturn -f
+
+# View all logs
+sudo journalctl -u hades-coturn
+
+# View last 50 lines
+sudo journalctl -u hades-coturn -n 50
+```
+
+### Testing
+
+```bash
+# Test STUN connectivity
+curl -v turn:coturn.dybng.no:3478
+
+# Test TURN TLS connectivity
+curl -v turns:coturn.dybng.no:5349
+```
 
 ### 3. Start the Server
 
