@@ -1,0 +1,34 @@
+[Unit]
+Description=Hades Coturn Server
+Documentation=https://github.com/coturn/coturn
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=coturn
+Group=coturn
+ExecStart=/usr/bin/coturn -c /etc/coturn/turnserver.conf -v
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=always
+RestartSec=3
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/log/coturn /var/lib/coturn
+ReadOnlyPaths=/etc/coturn
+
+# Resource limits
+LimitNOFILE=65536
+MemoryLimit=512M
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=hades-coturn
+
+[Install]
+WantedBy=multi-user.target

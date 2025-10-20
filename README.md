@@ -14,14 +14,20 @@ This Coturn server provides:
 
 ### Prerequisites
 
-- Docker and Docker Compose (supports both `docker-compose` and `docker compose`)
 - A domain name (e.g., `coturn.dybng.no`)
 - SSL certificates (Let's Encrypt recommended)
 - Open ports: 3478, 5349, and 49152-49999
 
-**Docker Compose Compatibility:**
-- Modern Docker: Use `./start.sh` (auto-detects version)
-- Legacy Docker: Use `docker-compose` commands manually
+### Deployment Options
+
+**Option 1: Docker (Recommended for development/testing)**
+- Docker and Docker Compose
+- Easy to manage and update
+
+**Option 2: Bare-Metal (Recommended for production VPS)**
+- Direct installation on VPS
+- Better performance and resource usage
+- More control over system configuration
 
 ### 1. Configuration
 
@@ -64,6 +70,43 @@ docker run -it --rm --name certbot \
 ls -la /etc/letsencrypt/live/coturn.dybng.no/
 ```
 
+## Bare-Metal Deployment (Production VPS)
+
+For production deployment on a dedicated VPS, use the bare-metal installation:
+
+### 1. Copy Files to VPS
+
+```bash
+# Copy the entire hades-coturn-server directory to your VPS
+scp -r hades-coturn-server/ user@your-vps:~/
+```
+
+### 2. Install and Configure
+
+```bash
+# SSH to your VPS
+ssh user@your-vps
+cd hades-coturn-server
+
+# Run the installation script (as root)
+sudo ./install-bare-metal.sh
+```
+
+### 3. Verify Installation
+
+```bash
+# Check service status
+sudo systemctl status hades-coturn
+
+# View logs
+sudo journalctl -u hades-coturn -f
+
+# Test connectivity
+curl -v turn:coturn.dybng.no:3478
+```
+
+## Docker Deployment (Development/Testing)
+
 ### 3. Start the Server
 
 ```bash
@@ -88,16 +131,38 @@ docker-compose logs -f coturn
 
 ## Deployment to Remote Host
 
-### Option 1: Docker Compose (Recommended)
+### Option 1: Bare-Metal (Recommended for Production)
+
+For dedicated Coturn servers, bare-metal deployment offers better performance:
+
+**Advantages:**
+- Lower resource overhead (no Docker layer)
+- Direct access to hardware acceleration
+- Better network performance
+- Simpler troubleshooting
+- More control over system configuration
+
+**Deployment Steps:**
+```bash
+# Copy files to VPS
+scp -r hades-coturn-server/ user@coturn.dybng.no:~/
+
+# SSH and install
+ssh user@coturn.dybng.no
+cd hades-coturn-server
+sudo ./install-bare-metal.sh
+```
+
+### Option 2: Docker Compose (Development/Testing)
 
 1. **Copy files to server:**
    ```bash
-   scp -r hades-coturn-server/ user@cdn.hades.lt:~
+   scp -r hades-coturn-server/ user@coturn.dybng.no:~
    ```
 
 2. **SSH to server and start:**
    ```bash
-   ssh user@cdn.hades.lt
+   ssh user@coturn.dybng.no
    cd hades-coturn-server
    docker-compose up -d
    ```
@@ -116,14 +181,14 @@ docker run -d \
   hades-coturn
 ```
 
-### Option 3: Systemd Service
+### Option 3: Systemd Service for Docker
 
 Create `/etc/systemd/system/hades-coturn.service`:
 
 ```ini
 [Unit]
-Description=Hades Coturn Server
-After=network.target
+Description=Hades Coturn Server (Docker)
+After=network.target docker.service
 
 [Service]
 Type=simple
