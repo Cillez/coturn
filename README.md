@@ -15,7 +15,7 @@ This Coturn server provides:
 ### Prerequisites
 
 - Docker and Docker Compose (supports both `docker-compose` and `docker compose`)
-- A domain name (e.g., `cdn.hades.lt`)
+- A domain name (e.g., `coturn.dybng.no`)
 - SSL certificates (Let's Encrypt recommended)
 - Open ports: 3478, 5349, and 49152-49999
 
@@ -36,8 +36,8 @@ nano .env
 **Required Settings:**
 ```bash
 # Domain must match your SSL certificate
-TURN_DOMAIN=cdn.hades.lt
-TURN_REALM=cdn.hades.lt
+TURN_DOMAIN=coturn.dybng.no
+TURN_REALM=coturn.dybng.no
 
 # Must match your backend's TURN_SECRET
 TURN_SECRET=test-secret-key
@@ -52,16 +52,16 @@ For production deployment, obtain SSL certificates:
 
 ```bash
 # Using Let's Encrypt (recommended)
-sudo certbot certonly --standalone -d cdn.hades.lt
+sudo certbot certonly --standalone -d coturn.dybng.no
 
 # Or using Docker
 docker run -it --rm --name certbot \
   -v "/etc/letsencrypt:/etc/letsencrypt" \
   -v "/var/lib/letsencrypt:/var/lib/letsencrypt" \
-  certbot/certbot certonly --standalone -d cdn.hades.lt
+  certbot/certbot certonly --standalone -d coturn.dybng.no
 
 # Verify certificates exist
-ls -la /etc/letsencrypt/live/cdn.hades.lt/
+ls -la /etc/letsencrypt/live/coturn.dybng.no/
 ```
 
 ### 3. Start the Server
@@ -194,14 +194,14 @@ curl http://localhost:9641/metrics
 2. **SSL Certificate Issues**
    ```bash
    # Check if certificates exist on host
-   ls -la /etc/letsencrypt/live/cdn.hades.lt/
+   ls -la /etc/letsencrypt/live/coturn.dybng.no/
 
    # Check certificate permissions
-   sudo chmod 644 /etc/letsencrypt/live/cdn.hades.lt/fullchain.pem
-   sudo chmod 600 /etc/letsencrypt/live/cdn.hades.lt/privkey.pem
+   sudo chmod 644 /etc/letsencrypt/live/coturn.dybng.no/fullchain.pem
+   sudo chmod 600 /etc/letsencrypt/live/coturn.dybng.no/privkey.pem
 
    # Test certificate validity
-   openssl x509 -in /etc/letsencrypt/live/cdn.hades.lt/fullchain.pem -text -noout
+   openssl x509 -in /etc/letsencrypt/live/coturn.dybng.no/fullchain.pem -text -noout
 
    # If using custom certificate paths, update docker-compose.yml volumes
    ```

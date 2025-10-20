@@ -6,8 +6,8 @@
 set -e
 
 echo "🚀 Starting Hades Coturn Server..."
-echo "📍 Domain: ${TURN_DOMAIN:-cdn.hades.lt}"
-echo "🌐 Realm: ${TURN_REALM:-cdn.hades.lt}"
+echo "📍 Domain: ${TURN_DOMAIN:-coturn.dybng.no}"
+echo "🌐 Realm: ${TURN_REALM:-coturn.dybng.no}"
 echo "🔐 External IP: ${EXTERNAL_IP:-auto}"
 echo "📊 Port Range: ${MIN_PORT:-49152}-${MAX_PORT:-49999}"
 
@@ -15,7 +15,7 @@ echo "📊 Port Range: ${MIN_PORT:-49152}-${MAX_PORT:-49999}"
 mkdir -p /var/log/coturn
 
 # Check if SSL certificates exist and are readable
-CERT_PATH="/etc/letsencrypt/live/cdn.hades.lt"
+CERT_PATH="/etc/letsencrypt/live/coturn.dybng.no"
 echo "🔍 Checking SSL certificates at: ${CERT_PATH}"
 
 if [ -f "${CERT_PATH}/fullchain.pem" ] && [ -f "${CERT_PATH}/privkey.pem" ]; then

@@ -7,7 +7,7 @@ echo "🔍 Checking SSL certificates for Hades Coturn Server..."
 echo ""
 
 # Check if Let's Encrypt certificates exist
-CERT_PATH="/etc/letsencrypt/live/cdn.hades.lt"
+CERT_PATH="/etc/letsencrypt/live/coturn.dybng.no"
 echo "📍 Checking certificate path: $CERT_PATH"
 
 if [ -f "$CERT_PATH/fullchain.pem" ] && [ -f "$CERT_PATH/privkey.pem" ]; then
@@ -26,10 +26,10 @@ if [ -f "$CERT_PATH/fullchain.pem" ] && [ -f "$CERT_PATH/privkey.pem" ]; then
     echo ""
     echo "🎯 Certificate looks good!"
     echo ""
-    echo "💡 Next steps:"
-    echo "   1. Restart the coturn container: docker-compose restart coturn"
-    echo "   2. Check logs: docker-compose logs -f coturn"
-    echo "   3. Test from backend: curl https://cdn.hades.lt:5349/"
+echo "💡 Next steps:"
+echo "   1. Restart the coturn container: $DOCKER_COMPOSE_CMD restart coturn"
+echo "   2. Check logs: $DOCKER_COMPOSE_CMD logs -f coturn"
+echo "   3. Test from backend: curl https://coturn.dybng.no:5349/"
 
 else
     echo "❌ Certificates not found at $CERT_PATH"
@@ -40,7 +40,7 @@ else
     # Check if certbot is installed
     if command -v certbot &> /dev/null; then
         echo "1️⃣  Generate new certificates:"
-        echo "   sudo certbot certonly --standalone -d cdn.hades.lt"
+        echo "   sudo certbot certonly --standalone -d coturn.dybng.no"
         echo ""
     fi
 
@@ -49,7 +49,7 @@ else
     echo ""
 
     echo "3️⃣  Manual certificate setup:"
-    echo "   - Copy your certificates to /etc/letsencrypt/live/cdn.hades.lt/"
+    echo "   - Copy your certificates to /etc/letsencrypt/live/coturn.dybng.no/"
     echo "   - Ensure correct permissions (644 for fullchain.pem, 600 for privkey.pem)"
     echo ""
 

@@ -50,7 +50,7 @@ ssh $REMOTE_USER@$REMOTE_HOST << EOF
         sudo systemctl stop apache2 || true
 
         # Get Let's Encrypt certificate
-        sudo certbot certonly --standalone -d cdn.hades.lt --agree-tos --register-unsafely-without-email
+        sudo certbot certonly --standalone -d coturn.dybng.no --agree-tos --register-unsafely-without-email
 
         # Restart web server if it was running
         sudo systemctl start nginx || true
@@ -70,9 +70,9 @@ ssh $REMOTE_USER@$REMOTE_HOST << EOF
     docker-compose logs --tail=10 coturn
 
     echo "✅ Deployment complete!"
-    echo "🌐 Coturn server should be available at:"
-    echo "   STUN/TURN: turn:cdn.hades.lt:3478"
-    echo "   TURN TLS:  turns:cdn.hades.lt:5349"
+echo "🌐 Coturn server should be available at:"
+echo "   STUN/TURN: turn:coturn.dybng.no:3478"
+echo "   TURN TLS:  turns:coturn.dybng.no:5349"
 EOF
 
 # Cleanup
