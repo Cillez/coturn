@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+  coturn:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hades-coturn-server
+    restart: unless-stopped
+
+    # Environment variables
+    env_file:
+      - .env
+
+    # Network configuration
+    network_mode: host  # Use host networking for TURN server
+
+    # Volume mounts
+    volumes:
+      # Let's Encrypt certificates - mount from host system
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      # Alternative certificate paths (uncomment if needed)
+      # - /home/user/certs:/etc/letsencrypt:ro
+      # - ./certs:/etc/letsencrypt:ro
+      # Log files
+      - ./logs:/var/log/coturn
+      # Configuration (read-only)
+      - ./turnserver.conf:/etc/coturn/turnserver.conf:ro
+
+    # Health check
+    healthcheck:
+      test: ["CMD", "pgrep", "coturn"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+    # Resource limits (adjust based on your server capacity)
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+        reservations:
+          memory: 256M
+          cpus: '0.25'
+
+    # Logging
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+# =============================================
+# PRODUCTION DEPLOYMENT NOTES
+# =============================================
+#
+# 1. Copy .env.example to .env and configure your settings
+# 2. Ensure your domain (TURN_DOMAIN) has valid SSL certificates
+# 3. Set EXTERNAL_IP to your server's public IP address
+# 4. Adjust port ranges if needed (MIN_PORT/MAX_PORT)
+# 5. For remote deployment, use: docker-compose -f docker-compose.yml up -d
+# 6. Monitor logs with: docker-compose logs -f coturn
+# 7. Check status with: docker-compose ps
+#
+# =============================================
+# PORTS USED BY THIS SERVICE
+# =============================================
+#
+# - 3478 (UDP/TCP): STUN/TURN
+# - 5349 (TCP): TURN over TLS
+# - 49152-49999 (UDP): Relay ports for peer connections
+# - 9641 (TCP): Prometheus metrics (optional)
+#
+# Ensure these ports are open in your firewall
+# =============================================
